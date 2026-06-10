@@ -2,27 +2,42 @@ from flask import Flask, request, render_template_string
 
 app = Flask(__name__)
 
-notes=[]
-
-HTML="""
+HTML = """
 <form method="POST">
-<input name="note" placeholder="Write note">
-<button>Save Note</button>
+<input name="name" placeholder="Enter Name"><br><br>
+
+<input name="bio" placeholder="Enter Bio"><br><br>
+
+<input name="image" placeholder="Enter Image URL"><br><br>
+
+<button type="submit">Generate</button>
 </form>
 
-<h3>Saved Notes</h3>
-
-{% for n in notes %}
-<p>{{n}}</p>
-{% endfor %}
+{% if name %}
+<hr>
+<h2>{{name}}</h2>
+<p>{{bio}}</p>
+<img src="{{image}}" width="200">
+{% endif %}
 """
 
 @app.route("/", methods=["GET","POST"])
-def home():
-    if request.method=="POST":
-        note=request.form["note"]
-        notes.append(note)
 
-    return render_template_string(HTML, notes=notes)
+def home():
+    name=""
+    bio=""
+    image=""
+
+    if request.method=="POST":
+        name=request.form["name"]
+        bio=request.form["bio"]
+        image=request.form["image"]
+
+    return render_template_string(
+        HTML,
+        name=name,
+        bio=bio,
+        image=image
+    )
 
 app.run(debug=True)
