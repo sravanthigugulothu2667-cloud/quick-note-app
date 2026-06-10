@@ -1,43 +1,44 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
+coffee = {
+    "Cold Brew": 0,
+    "Latte": 0,
+    "Cappuccino": 0
+}
+
 HTML = """
-<form method="POST">
-<input name="name" placeholder="Enter Name"><br><br>
+<h1>Coffee Rating App</h1>
 
-<input name="bio" placeholder="Enter Bio"><br><br>
+{% for name,vote in coffee.items() %}
+<form action="/vote/{{name}}" method="POST">
 
-<input name="image" placeholder="Enter Image URL"><br><br>
+<h3>{{name}}</h3>
 
-<button type="submit">Generate</button>
+Votes: {{vote}}
+
+<button type="submit">
+Vote
+</button>
+
 </form>
 
-{% if name %}
 <hr>
-<h2>{{name}}</h2>
-<p>{{bio}}</p>
-<img src="{{image}}" width="200">
-{% endif %}
+
+{% endfor %}
 """
 
-@app.route("/", methods=["GET","POST"])
-
+@app.route("/")
 def home():
-    name=""
-    bio=""
-    image=""
-
-    if request.method=="POST":
-        name=request.form["name"]
-        bio=request.form["bio"]
-        image=request.form["image"]
-
     return render_template_string(
         HTML,
-        name=name,
-        bio=bio,
-        image=image
+        coffee=coffee
     )
+
+@app.route("/vote/<name>", methods=["POST"])
+def vote(name):
+    coffee[name]+=1
+    return home()
 
 app.run(debug=True)
